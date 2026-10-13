@@ -58,25 +58,25 @@ def static_fig():
             axx.plot(t, y, color=c, lw=2.5)
             axx.axhline(0, color="0.7", lw=0.8)
             axx.set_yticks([])            
-            axx.set_ylabel(lab)
+            axx.set_ylabel(lab, fontsize=20)
             if title == "Discrete":
-                for w in dwell_windows:
-                    axx.axvspan(w[0], min(w[1], T_total), color=C_D, alpha=0.12, lw=0)
+                w = dwell_windows[1]                
+                axx.axvspan(w[0], min(w[1], T_total), color=C_D, alpha=0.12, lw=0)
             else:
                 for tr in rev_t:
-                    axx.axvline(tr, color=C_R, ls=":", lw=1)
+                    axx.axvline(tr, color=C_R, ls=":", lw=2)
                 if row > 0:
                     i = np.clip((rev_t * fs).astype(int), 0, len(t) - 1)
-                    axx.plot(t[i], y[i], "o", color=C_R, ms=7, mfc="white", mew=2)
-        ax[0].set_title(title, fontweight="bold", color=c)
-        ax[2].set_xlabel("Time (s)"); ax[2].set_xticks([0, 1, 2, 3, 4])
+                    axx.plot(t[i], y[i], "o", color=C_R, ms=10, mfc="white", mew=2)
+        ax[0].set_title(title, fontweight="bold", color=c, fontsize=20)
+        ax[2].set_xlabel("Time (s)", fontsize=20); ax[2].set_xticks([0, 1, 2, 3, 4])
 
         if title == "Discrete":
             ax[2].text(0.01, -0.45, "Shaded: postures held, v = 0 and a = 0",
-                    transform=ax[2].transAxes, color=C_D, fontsize=11)
+                    transform=ax[2].transAxes, color=C_D, fontsize=16)
         else:
             ax[2].text(0.01, -0.45, "Dotted: reversals, v = 0 while |a| is maximal",
-                    transform=ax[2].transAxes, color=C_R, fontsize=11)
+                    transform=ax[2].transAxes, color=C_R, fontsize=16)
         fig.tight_layout()
         tit = "figures/%s.png" % title.lower()
         fig.savefig(tit, dpi=200, transparent=True)
@@ -129,6 +129,6 @@ def animation():
 # %% 
 if __name__ == "__main__":
     static_fig()
-    animation()
+    #animation()
 
 # %%
