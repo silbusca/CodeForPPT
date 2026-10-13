@@ -50,18 +50,16 @@ rev_t = np.arange(0, T_total - 1e-9, 1 / (2 * f))  # reversals (v = 0)
 
 # %% ---------- Static figure ----------
 def static_fig():
-    fig, ax = plt.subplots(3, 2, figsize=(12, 6.5), sharex=True)
-    for col, (x, v, a, c, title) in enumerate(
-            [(xd, vd, ad, C_D, "Discrete"), (xr, vr, ar, C_R, "Rhythmic")]):
+    for (x, v, a, c, title) in ([(xd, vd, ad, C_D, "Discrete"), (xr, vr, ar, C_R, "Rhythmic")]):
+        fig, ax = plt.subplots(3, 1, figsize=(12, 6.5), sharex=True)
         for row, (y, lab) in enumerate([(x, "Position"), (v, "Velocity"), (a, "Acceleration")]):
-            axx = ax[row, col]
+            axx = ax[row]
             axx.set_xlim(0, T_total)
             axx.plot(t, y, color=c, lw=2.5)
             axx.axhline(0, color="0.7", lw=0.8)
-            axx.set_yticks([])
-            if col == 0:
-                axx.set_ylabel(lab)
-            if col == 0:
+            axx.set_yticks([])            
+            axx.set_ylabel(lab)
+            if title == "Discrete":
                 for w in dwell_windows:
                     axx.axvspan(w[0], min(w[1], T_total), color=C_D, alpha=0.12, lw=0)
             else:
@@ -70,15 +68,19 @@ def static_fig():
                 if row > 0:
                     i = np.clip((rev_t * fs).astype(int), 0, len(t) - 1)
                     axx.plot(t[i], y[i], "o", color=C_R, ms=7, mfc="white", mew=2)
-        ax[0, col].set_title(title, fontweight="bold", color=c)
-        ax[2, col].set_xlabel("Time (s)"); ax[2, col].set_xticks([0, 1, 2, 3, 4])
-    ax[2, 0].text(0.01, -0.45, "Shaded: postures held, v = 0 and a = 0",
-                  transform=ax[2, 0].transAxes, color=C_D, fontsize=11)
-    ax[2, 1].text(0.01, -0.45, "Dotted: reversals, v = 0 while |a| is maximal",
-                  transform=ax[2, 1].transAxes, color=C_R, fontsize=11)
-    fig.tight_layout()
-    fig.savefig("figures/discrete_vs_rhythmic.png", dpi=200, transparent=True)
-    #plt.close(fig)
+        ax[0].set_title(title, fontweight="bold", color=c)
+        ax[2].set_xlabel("Time (s)"); ax[2].set_xticks([0, 1, 2, 3, 4])
+
+        if title == "Discrete":
+            ax[2].text(0.01, -0.45, "Shaded: postures held, v = 0 and a = 0",
+                    transform=ax[2].transAxes, color=C_D, fontsize=11)
+        else:
+            ax[2].text(0.01, -0.45, "Dotted: reversals, v = 0 while |a| is maximal",
+                    transform=ax[2].transAxes, color=C_R, fontsize=11)
+        fig.tight_layout()
+        tit = "figures/%s.png" % title.lower()
+        fig.savefig(tit, dpi=200, transparent=True)
+        #plt.close(fig)
 
 # %% ---------- Animation: moving hand + traces building up ----------
 def animation():
