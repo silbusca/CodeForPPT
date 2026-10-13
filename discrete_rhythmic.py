@@ -1,3 +1,4 @@
+# %% Imports and settings
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter, FFMpegWriter
@@ -11,11 +12,11 @@ fs = 500
 
 C_D, C_R = "#f39c12",  "#107181"
 
-# ---------- Discrete: minimum-jerk movements between postures, with dwells ----------
+# %%  ---------- Discrete: minimum-jerk movements between postures, with dwells ----------
 MT, DWELL = 1.5, 1.0                  # movement time, hold time (s)
-targets = [0, 1, 0, 1, 0]
+#targets = [0, 1, 0, 1, 0]
 targets = [0, 1, 0]
-T_total = (MT + DWELL) * (len(targets) - 1) + DWELL
+T_total = (MT + DWELL) * (len(targets) - 1) 
 t = np.arange(0, T_total, 1 / fs)
 
 xd = np.zeros_like(t)
@@ -33,7 +34,7 @@ for k in range(len(targets) - 1):
     t0 += MT + DWELL
 xd[t >= t0] = targets[-1]
 
-# ---------- Rhythmic: sinusoid, same range and same mean period ----------
+# %%  ---------- Rhythmic: sinusoid, same range and same mean period ----------
 f = 1 / (2 * (MT + DWELL))            # one cycle = two discrete movements
 xr = 0.5 - 0.5 * np.cos(2 * np.pi * f * t)
 
@@ -47,7 +48,7 @@ vr = 0.5 * w * np.sin(w * t)           # analytic derivatives (no edge artifacts
 ar = 0.5 * w**2 * np.cos(w * t)
 rev_t = np.arange(0, T_total - 1e-9, 1 / (2 * f))  # reversals (v = 0)
 
-# ---------- Static figure ----------
+# %% ---------- Static figure ----------
 def static_fig():
     fig, ax = plt.subplots(3, 2, figsize=(12, 6.5), sharex=True)
     for col, (x, v, a, c, title) in enumerate(
@@ -76,10 +77,10 @@ def static_fig():
     ax[2, 1].text(0.01, -0.45, "Dotted: reversals, v = 0 while |a| is maximal",
                   transform=ax[2, 1].transAxes, color=C_R, fontsize=11)
     fig.tight_layout()
-    fig.savefig("discrete_vs_rhythmic.png", dpi=200, transparent=True)
-    plt.close(fig)
+    fig.savefig("figures/discrete_vs_rhythmic.png", dpi=200, transparent=True)
+    #plt.close(fig)
 
-# ---------- Animation: moving hand + traces building up ----------
+# %% ---------- Animation: moving hand + traces building up ----------
 def animation():
     for (x, v, a, c, title) in ([(xd, vd, ad, C_D, "Discrete"), (xr, vr, ar, C_R, "Rhythmic")]):
         col = 0
@@ -119,11 +120,13 @@ def animation():
             return out
 
         anim = FuncAnimation(fig, update, frames=frames, blit=True)
-        tit = "%s" % title.lower()
+        tit = "figures/%s" % title.lower()
         anim.save(tit +".mp4", writer=FFMpegWriter(fps=50, bitrate=3000), dpi=120)
         anim.save(tit +".gif", writer=PillowWriter(fps=25), dpi=80)
-        plt.close(fig)
-
+        #plt.close(fig)
+# %% 
 if __name__ == "__main__":
     static_fig()
     animation()
+
+# %%
